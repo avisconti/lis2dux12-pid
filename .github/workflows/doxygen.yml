@@ -1,4 +1,4 @@
-name: Test Doxygen Generation
+name: Generate Doxygen into doc
 
 on:
   push:
@@ -6,47 +6,57 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  docs-test:
+  docs:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Ensure doc directory and Doxyfile exist
-        run: |
-          mkdir -p doc
-          if [ ! -f doc/Doxyfile ]; then
-            printf '%s\n' \
-              'PROJECT_NAME           = "Project Documentation"' \
-              'OUTPUT_DIRECTORY       = doc' \
-              'GENERATE_HTML          = YES' \
-              'HTML_OUTPUT            = html' \
-              'GENERATE_LATEX         = NO' \
-              'RECURSIVE              = YES' \
-              'INPUT                  = .' \
-              'EXCLUDE                = doc' \
-              'QUIET                  = YES' \
-              > doc/Doxyfile
-          fi
+        with:
+          persist-credentials: true
 
       - name: Install Doxygen
         run: |
           sudo apt-get update
           sudo apt-get install -y doxygen graphviz
 
+      - name: Ensure doc directory exists
+        run: mkdir -p doc
+
+      - name: Create Doxyfile if missing
+        run: |
+          if [ ! -f doc/Doxyfile ]; then
+            printf '%s\n' \
+              'PROJECT_NAME           = "Project Documentation"' \
+              'OUTPUT_DIRECTORY       = doc' \
+              'GENERATE_HTML          = YES' \
+              'HTML_OUTPUT            = ' \
+              'GENERATE_LATEX         = NO' \
+              'RECURSIVE              = YES' \
+              'INPUT                  = .' \
+              'FILE_PATTERNS          = *.h *.c *.hpp *.cpp' \
+              'EXCLUDE                = doc' \
+              'QUIET                  = YES' \
+              > doc/Doxyfile
+          fi
+
       - name: Generate Doxygen Docs
         run: doxygen doc/Doxyfile
 
-      - name: Verify generated docs
+      - name: Commit generated documentation
         run: |
-          ls -la doc
-          ls -la doc/html
-          test -f doc/html/index.html
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Upload Doxygen HTML artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: doxygen-html
-          path: doc/html
+          git add doc
+
+          if git diff --cached --quiet; then
+            echo "No documentation changes to commit."
+          else
+            git commit -m "Update generated Doxygen documentation"
+            git push
+          fi
