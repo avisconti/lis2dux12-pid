@@ -1,9 +1,9 @@
-name: Generate Doxygen into doc
+name: Generate Doxygen into doc on tag
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -11,12 +11,14 @@ permissions:
 
 jobs:
   docs:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout tagged commit
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: true
 
       - name: Install Doxygen
@@ -49,6 +51,12 @@ jobs:
 
       - name: Commit generated documentation
         run: |
+          TAG_COMMIT=$(git rev-list -n 1 "$GITHUB_REF_NAME")
+          DEFAULT_BRANCH=master
+
+          git checkout "$DEFAULT_BRANCH"
+          git pull origin "$DEFAULT_BRANCH"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -57,6 +65,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No documentation changes to commit."
           else
-            git commit -m "Update generated Doxygen documentation"
-            git push
+            git commit -m "Update generated Doxygen documentation for tag $GITHUB_REF_NAME [skip ci]"
+            git push origin "$DEFAULT_BRANCH"
           fi
