@@ -1,0 +1,10 @@
+<map id="FIFO" name="FIFO">
+<area shape="rect" id="Node000001" title="FIFO /." alt="" coords="148,129,200,155"/>
+<area shape="rect" id="Node000006" href="$group__Free.html" title="Free Fall /." alt="" coords="305,5,349,31"/>
+<area shape="rect" id="Node000007" href="$group__Orientation.html" title="Orientation 6D (and 4D) /." alt="" coords="277,55,377,80"/>
+<area shape="rect" id="Node000005" href="$group__Significant.html" title="Significant motion detection /." alt="" coords="261,104,394,129"/>
+<area shape="rect" id="Node000003" href="$group__Step.html" title="Step Counter (Pedometer) /." alt="" coords="248,153,407,179"/>
+<area shape="rect" id="Node000004" href="$group__Tilt.html" title="Tilt /." alt="" coords="306,203,349,228"/>
+<area shape="rect" id="Node000008" href="$group__wakeup.html" title="wakeup configuration /" alt="" coords="274,252,381,277"/>
+<area shape="rect" id="Node000002" href="$group__LIS2DUX12.html" title="This file provides a set of functions needed to drive the lis2dux12 sensor." alt="" coords="5,129,100,155"/>
+</map>
